@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 곱셈공식 퀴즈</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Noto Sans KR',sans-serif;
+      background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      position:relative;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:'';
+      position:fixed;
+      width:200%;
+      height:200%;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(229, 62, 62, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+    .container{
+      background:rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius:24px;
+      box-shadow:0 30px 90px rgba(0,0,0,0.5);
+      padding:50px;
+      max-width:900px;
+      width:100%;
+      position:relative;
+    }
+
+    .screen{display:none}
+    .screen.active{display:block;animation:fadeIn .5s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    h1{
+      text-align:center;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom:10px;
+      font-size:2.5em;
+      font-weight:900;
+    }
+    .subtitle{text-align:center;color:#666;margin-bottom:40px}
+
+    .nickname-input{
+      text-align:center;
+      padding:40px 0;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:20px;
+    }
+    .nickname-input input{
+      width:300px !important;
+      min-width:300px !important;
+      max-width:300px !important;
+      padding:18px !important;
+      font-size:1.2em !important;
+      border:3px solid #667eea;
+      border-radius:12px;
+      text-align:center;
+      font-weight:700;
+      font-family:'Noto Sans KR',sans-serif !important;
+    }
+    .nickname-input input:focus{
+      outline:none;
+      border-color:#764ba2;
+      box-shadow:0 0 20px rgba(102,126,234,.3);
+    }
+    .nickname-input button{width:200px;padding:16px 0;box-sizing:border-box}
+
+    .welcome-text{font-size:1.8em;font-weight:900;color:#667eea;margin-bottom:40px;text-align:center}
+
+    .mode-buttons{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+    .mode-card{
+      background:linear-gradient(135deg,#f8f9fa 0%,#ffffff 100%);
+      border:3px solid #e9ecef;
+      border-radius:20px;
+      padding:40px 30px;
+      width:280px;
+      cursor:pointer;
+      transition:all .3s;
+    }
+    .mode-card:hover{
+      transform:translateY(-10px);
+      box-shadow:0 20px 50px rgba(102,126,234,.3);
+      border-color:#667eea;
+    }
+    .mode-card.time-attack{border-color:#ef4444}
+    .mode-card.time-attack:hover{
+      border-color:#ef4444;
+      box-shadow:0 20px 50px rgba(239,68,68,.3);
+    }
+    .mode-icon{font-size:3em;margin-bottom:20px}
+    .mode-title{font-size:1.5em;font-weight:900;margin-bottom:15px;color:#1a1a2e}
+    .mode-desc{color:#666;line-height:1.6}
+
+    .quiz-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
+      padding:20px;
+      background:#f8f9fa;
+      border-radius:15px;
+    }
+    .question-counter{font-size:1.3em;font-weight:900;color:#667eea}
+    .timer{
+      font-size:2em;
+      font-weight:900;
+      color:#ef4444;
+      font-family:'JetBrains Mono',monospace;
+    }
+    .timer.warning{animation:pulse .5s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+    .question-area{
+      background:linear-gradient(135deg,#f8f9fa 0%,#ffffff 100%);
+      padding:40px;
+      border-radius:20px;
+      margin-bottom:30px;
+      min-height:180px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border:2px solid #e9ecef;
+    }
+    .question-text{font-size:1.2em;color:#333;margin-bottom:20px;font-weight:700;text-align:center}
+    .formula{
+      font-family:'JetBrains Mono',monospace;
+      color:#1a1a2e;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      padding:0 10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .formula.size-xs{font-size:.9em}
+    .formula.size-small{font-size:1.1em}
+    .formula.size-medium{font-size:1.3em}
+    .formula.size-large{font-size:1.5em}
+
+    input[type="text"]{
+      width:110px;
+      min-width:80px;
+      max-width:160px;
+      padding:10px 12px;
+      font-size:1em;
+      border:3px solid #667eea;
+      border-radius:12px;
+      text-align:center;
+      font-family:'JetBrains Mono',monospace;
+      font-weight:700;
+    }
+    input[type="text"]:focus{
+      outline:none;
+      border-color:#764ba2;
+      box-shadow:0 0 20px rgba(102,126,234,.3);
+    }
+    input[type="text"].correct{border-color:#10b981;background:#d1fae5}
+    input[type="text"].incorrect{border-color:#ef4444;background:#fee2e2}
+
+    .buttons{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+    button{
+      padding:16px 40px;
+      font-size:1.1em;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:900;
+      font-family:'Noto Sans KR',sans-serif;
+      transition:all .3s;
+    }
+    .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff}
+    .btn-primary:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 12px 35px rgba(102,126,234,.5)}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+
+    .btn-success{background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff}
+    .btn-success:hover{transform:translateY(-3px)}
+    .btn-secondary{background:linear-gradient(135deg,#6b7280 0%,#4b5563 100%);color:#fff}
+    .btn-secondary:hover{transform:translateY(-3px)}
+
+    .result-nickname{font-size:1.1em;font-weight:900;text-align:center;color:#1f2937;margin-bottom:10px}
+    .result-badge{font-size:3em;text-align:center;margin:10px 0 5px}
+    .result-title{font-size:1.5em;font-weight:900;text-align:center;margin-bottom:5px;color:#6b7280}
+    .result-score{font-size:2em;font-weight:900;color:#4f46e5;text-align:center;margin-bottom:15px}
+    .result-details{
+      background:#fde047;
+      border-radius:15px;
+      padding:20px;
+      margin-bottom:20px;
+      max-height:520px;
+      overflow-y:auto;
+    }
+    .result-details h3{margin-bottom:15px;color:#374151;font-size:.9em;font-weight:700;text-align:center}
+    .result-item{padding:8px 0;border-bottom:none;font-size:.85em;line-height:1.6;color:#1f2937;font-weight:600}
+    .result-number{color:#1f2937;font-weight:900}
+    .result-question{font-family:'JetBrains Mono',monospace;font-size:.9em;color:#1f2937;display:inline;font-weight:600}
+    .result-status{font-weight:900;font-size:1em}
+    .result-status.correct{color:#059669}
+    .result-status.incorrect{color:#dc2626}
+
+    .logo-container{text-align:center;margin-top:40px;padding-top:30px;border-top:2px solid #e9ecef}
+    .logo-text{
+      font-size:1.5em;
+      font-weight:900;
+      background:linear-gradient(135deg,#8b7355 0%,#a0826d 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      letter-spacing:2px;
+    }
+
+    /* 캡처 전용 카드 */
+    #shareStage{
+      position:fixed;
+      left:-99999px;
+      top:0;
+      width:760px;
+      padding:0;
+      background:#fff;
+      font-family:'Noto Sans KR',sans-serif;
+    }
+    .shareCard{
+      width:760px;
+      background:#fff;
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:0 0 0 rgba(0,0,0,0);
+      border:0;
+    }
+    .shareTop{
+      padding:34px 30px 10px;
+      text-align:center;
+      background:#ffffff;
+    }
+    .shareName{
+      font-size:42px;
+      font-weight:900;
+      color:#111827;
+      margin-bottom:10px;
+      letter-spacing:.2px;
+    }
+    .shareBadge{
+      font-size:52px;
+      line-height:1;
+      margin:8px 0 6px;
+    }
+    .shareTitle{
+      font-size:56px;
+      font-weight:900;
+      color:#6b7280;
+      margin:8px 0 0;
+    }
+    .shareScore{
+      font-size:88px;
+      font-weight:900;
+      color:#4f46e5;
+      margin:6px 0 18px;
+    }
+    .shareBox{
+      margin:18px 22px 0;
+      background:#F9E86A;
+      border-radius:26px;
+      padding:26px 26px 22px;
+    }
+    .shareBoxTitle{
+      text-align:center;
+      font-size:26px;
+      font-weight:900;
+      color:#374151;
+      margin-bottom:18px;
+      letter-spacing:.2px;
+    }
+    .shareRow{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      font-size:20px;
+      line-height:1.85;
+      font-weight:700;
+      color:#111827;
+      padding:6px 0;
+    }
+    .shareIdx{width:34px;font-weight:900}
+    .shareMark{width:26px;font-weight:900}
+    .shareMark.ok{color:#10b981}
+    .shareMark.no{color:#ef4444}
+    .shareText{
+      font-family:'JetBrains Mono',monospace;
+      font-size:19px;
+      font-weight:700;
+      color:#111827;
+      word-break:break-word;
+    }
+    .shareFoot{
+      height:92px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#eae6df;
+      margin-top:18px;
+    }
+    .shareFootText{
+      font-size:52px;
+      font-weight:900;
+      color:#b7b2ab;
+      letter-spacing:2px;
+    }
+
+    @media (max-width: 768px){
+      .container{padding:30px 20px}
+      h1{font-size:2em}
+      .mode-buttons{flex-direction:column;align-items:center}
+      .mode-card{width:100%}
+      .quiz-header{flex-direction:column;gap:15px}
+      .question-area{padding:25px 15px}
+      .question-text{font-size:1em}
+      .formula.size-xs{font-size:.72em;gap:4px}
+      .formula.size-small{font-size:.9em;gap:5px}
+      .formula.size-medium{font-size:1.05em;gap:6px}
+      .formula.size-large{font-size:1.25em}
+      input[type="text"]{width:90px;min-width:70px;padding:8px 10px;font-size:.9em}
+      button{padding:12px 25px;font-size:.95em}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- 닉네임 입력 -->
+    <div id="nicknameScreen" class="screen active">
+      <h1>🧮 곱셈공식 퀴즈</h1>
+      <p class="subtitle">AI가 수학적으로 동치인 답안을 자동으로 인식합니다</p>
+
+      <div class="nickname-input">
+        <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20" inputmode="text" autocapitalize="off">
+        <br>
+        <button class="btn-primary" onclick="startGame()">시작하기</button>
+      </div>
+
+      <div class="logo-container">
+        <div class="logo-text">지니GO수학</div>
+      </div>
+    </div>
+
+    <!-- 모드 선택 -->
+    <div id="modeScreen" class="screen">
+      <h1>환영합니다! 🎉</h1>
+      <p class="welcome-text"><span id="welcomeNickname"></span>님</p>
+
+      <div class="mode-buttons">
+        <div class="mode-card time-attack" onclick="selectMode('timeAttack')">
+          <div class="mode-icon">⚡</div>
+          <div class="mode-title">타임어택</div>
+          <div class="mode-desc">
+            10초 안에 답하세요!<br>
+            긴장감 넘치는 도전<br>
+            총 10문제
+          </div>
+        </div>
+
+        <div class="mode-card" onclick="selectMode('free')">
+          <div class="mode-icon">🎯</div>
+          <div class="mode-title">프리 모드</div>
+          <div class="mode-desc">
+            시간 제한 없이<br>
+            천천히 생각하며 풀기<br>
+            총 10문제
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-container">
+        <div class="logo-text">지니GO수학</div>
+      </div>
+    </div>
+
+    <!-- 퀴즈 -->
+    <div id="quizScreen" class="screen">
+      <div class="quiz-header">
+        <div class="question-counter">
+          <span id="currentQuestion">1</span> / 10
+        </div>
+        <div class="timer" id="timer"></div>
+      </div>
+
+      <div class="question-area">
+        <div class="question-text">다음 식의 빈칸을 채워주세요</div>
+        <div class="formula" id="question"></div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn-primary" onclick="checkAnswer()" id="checkBtn">정답 확인</button>
+        <button class="btn-success" onclick="gameMode === 'timeAttack' ? handleTimeAttackAnswer() : nextQuestion()" id="nextBtn" disabled>다음 문제</button>
+      </div>
+      <div class="buttons" style="margin-top: 10px;">
+        <button class="btn-secondary" onclick="goHome()" id="homeBtn">🏠 메인으로</button>
+      </div>
+    </div>
+
+    <!-- 결과 -->
+    <div id="resultScreen" class="screen">
+      <div class="result-nickname" id="resultNickname"></div>
+      <div class="result-badge" id="resultBadge"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-score"><span id="finalScore"></span> / 10</div>
+
+      <div class="result-details" id="resultDetails"></div>
+
+      <div class="buttons">
+        <button class="btn-success" onclick="shareResult()">📤 결과 공유하기</button>
+        <button class="btn-primary" onclick="restartGame()">🔄 다시 시작</button>
+      </div>
+
+      <div class="logo-container">
+        <div class="logo-text">지니GO수학</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 캡처 전용(화면에 안 보임) -->
+  <div id="shareStage" aria-hidden="true">
+    <div class="shareCard" id="shareCard">
+      <div class="shareTop">
+        <div class="shareName" id="shareName">-</div>
+        <div class="shareBadge" id="shareBadge">🎉</div>
+        <div class="shareTitle" id="shareTitle">Great!</div>
+        <div class="shareScore" id="shareScore">0 / 10</div>
+      </div>
+
+      <div class="shareBox">
+        <div class="shareBoxTitle">정답 내역</div>
+        <div id="shareList"></div>
+      </div>
+
+      <div class="shareFoot">
+        <div class="shareFootText">지니GO수학</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ 요청하신 “(a+b+c)^2, (a^3±b^3), 3변수 항등식/인수분해” 계열을 대량 추가
+    const formulas = [
+      // (a+b+c)^2, a^2+b^2+c^2 관련
+      { display: ["(a+b+c)²", "=", "a²", "+", "b²", "+", "c²", "+", "2ab", "+", "2bc", "+", "blank"], answer: "2ca" },
+      { display: ["(a+b+c)²", "=", "a²", "+", "b²", "+", "c²", "+", "blank", "+", "2bc", "+", "2ca"], answer: "2ab" },
+      { display: ["(a+b+c)²", "=", "a²", "+", "b²", "+", "c²", "+", "2ab", "+", "blank", "+", "2ca"], answer: "2bc" },
+      { display: ["a²+b²+c²", "=", "(a+b+c)²", "-", "blank"], answer: "2(ab+bc+ca)" },
+      { display: ["a²+b²+c²", "=", "(a+b+c)²", "-", "2ab", "-", "2bc", "-", "blank"], answer: "2ca" },
+
+      // 3차 전개
+      { display: ["(a+b)³", "=", "a³", "+", "blank", "+", "3ab²", "+", "b³"], answer: "3a²b" },
+      { display: ["(a-b)³", "=", "a³", "-", "blank", "+", "3ab²", "-", "b³"], answer: "3a²b" },
+      { display: ["(a-b)³", "=", "a³", "-", "3a²b", "+", "blank", "-", "b³"], answer: "3ab²" },
+      { display: ["(a+b)³", "=", "blank", "+", "3a²b", "+", "3ab²", "+", "b³"], answer: "a³" },
+
+      // a^3 ± b^3 인수분해
+      { display: ["(a+b)(a²-ab+b²)", "=", "a³", "+", "blank"], answer: "b³" },
+      { display: ["(a-b)(a²+ab+b²)", "=", "a³", "-", "blank"], answer: "b³" },
+      { display: ["a³+b³", "=", "(a+b)³", "-", "3ab", "blank"], answer: "(a+b)" },
+      { display: ["a³-b³", "=", "(a-b)³", "+", "3ab", "blank"], answer: "(a-b)" },
+      { display: ["a³+b³", "=", "(a+b)(a²-ab+b²)", "=", "blank"], answer: "(a+b)³-3ab(a+b)" },
+      { display: ["a³-b³", "=", "(a-b)(a²+ab+b²)", "=", "blank"], answer: "(a-b)³+3ab(a-b)" },
+
+      // (x+a)(x+b)(x+c)
+      { display: ["(x+a)(x+b)(x+c)", "=", "x³", "+", "(a+b+c)x²", "+", "blank", "+", "abc"], answer: "(ab+bc+ca)x" },
+      { display: ["(x+a)(x+b)(x+c)", "=", "x³", "+", "blank", "+", "(ab+bc+ca)x", "+", "abc"], answer: "(a+b+c)x²" },
+
+      // (a+b+c)(a^2+b^2+c^2-ab-bc-ca)
+      { display: ["(a+b+c)(a²+b²+c²-ab-bc-ca)", "=", "a³", "+", "b³", "+", "c³", "-", "blank"], answer: "3abc" },
+      { display: ["(a+b+c)(a²+b²+c²-ab-bc-ca)", "=", "blank", "+", "b³", "+", "c³", "-", "3abc"], answer: "a³" },
+
+      // a^3+b^3+c^3 항등식
+      { display: ["a³+b³+c³", "=", "(a+b+c)(a²+b²+c²-ab-bc-ca)", "+", "blank"], answer: "3abc" },
+      { display: ["a³+b³+c³", "=", "blank", "+", "3abc"], answer: "(a+b+c)(a²+b²+c²-ab-bc-ca)" },
+
+      // a^2+b^2+c^2-ab-bc-ca = 1/2(...)
+      { display: ["a²+b²+c²-ab-bc-ca", "=", "1/2{(a-b)²+(b-c)²+", "blank", "}"], answer: "(c-a)²" },
+      { display: ["a²+b²+c²-ab-bc-ca", "=", "1/2{(a-b)²+", "blank", "+(c-a)²}"], answer: "(b-c)²" },
+
+      // (a^2+ab+b^2)(a^2-ab+b^2)
+      { display: ["(a²+ab+b²)(a²-ab+b²)", "=", "a⁴", "+", "a²b²", "+", "blank"], answer: "b⁴" },
+      { display: ["(a²+ab+b²)(a²-ab+b²)", "=", "blank", "+", "a²b²", "+", "b⁴"], answer: "a⁴" },
+
+      // 추가로 자주 나오는 2변수/기본
+      { display: ["(x+3)(x+5)", "=", "x²", "+", "blank", "+", "15"], answer: "8x" },
+      { display: ["(3x+5)(3x-5)", "=", "blank", "-", "25"], answer: "9x²" },
+      { display: ["(5x-2y)²", "=", "blank", "-", "20xy", "+", "4y²"], answer: "25x²" },
+      { display: ["(2x+3)(3x+4)", "=", "blank", "+", "17x", "+", "12"], answer: "6x²" },
+      { display: ["(a+b)²", "=", "a²", "+", "blank", "+", "b²"], answer: "2ab" },
+
+      // 3변수 보조 패턴(자주 출제되는 형태)
+      { display: ["ab+bc+ca", "=", "blank"], answer: "( (a+b+c)² - (a²+b²+c²) ) / 2" },
+      { display: ["a²+b²+c²", "=", "(a+b+c)²", "-", "2ab", "-", "2bc", "-", "blank"], answer: "2ca" },
+    ];
+
+    let nickname = '';
+    let gameMode = '';
+    let currentQuestionIndex = 0;
+    let questionSet = [];
+    let userAnswers = [];
+    let timer = null;
+    let timeLeft = 10;
+
+    function startGame() {
+      nickname = document.getElementById('nicknameInput').value.trim();
+      if (!nickname) { alert('닉네임을 입력해주세요!'); return; }
+      document.getElementById('welcomeNickname').textContent = nickname;
+      showScreen('modeScreen');
+    }
+
+    function selectMode(mode) {
+      gameMode = mode;
+      prepareQuiz();
+      showScreen('quizScreen');
+      displayQuestion();
+    }
+
+    function prepareQuiz() {
+      // 중복 방지 셔플
+      const shuffled = [...formulas].sort(() => Math.random() - 0.5);
+      questionSet = shuffled.slice(0, 10);
+      currentQuestionIndex = 0;
+      userAnswers = [];
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function displayQuestion() {
+      const question = questionSet[currentQuestionIndex];
+      const questionDiv = document.getElementById('question');
+      questionDiv.innerHTML = '';
+
+      const formulaLength = question.display.join('').length;
+      let sizeClass;
+      if (formulaLength > 55) sizeClass = 'size-xs';
+      else if (formulaLength > 40) sizeClass = 'size-small';
+      else if (formulaLength > 28) sizeClass = 'size-medium';
+      else sizeClass = 'size-large';
+      questionDiv.className = `formula ${sizeClass}`;
+
+      question.display.forEach(part => {
+        if (part === 'blank') {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = 'answerInput';
+          input.setAttribute('inputmode', 'text');
+          input.setAttribute('autocapitalize', 'off');
+          input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              if (gameMode === 'timeAttack') handleTimeAttackAnswer();
+              else checkAnswer();
+            }
+          });
+          questionDiv.appendChild(input);
+        } else {
+          const span = document.createElement('span');
+          span.textContent = part;
+          questionDiv.appendChild(span);
+        }
+      });
+
+      document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+
+      if (gameMode === 'timeAttack') {
+        document.getElementById('checkBtn').style.display = 'none';
+        document.getElementById('nextBtn').disabled = false;
+        document.getElementById('nextBtn').textContent = '다음 문제 (Enter)';
+      } else {
+        document.getElementById('checkBtn').style.display = 'block';
+        document.getElementById('checkBtn').disabled = false;
+        document.getElementById('nextBtn').disabled = true;
+        document.getElementById('nextBtn').textContent = '다음 문제';
+      }
+
+      document.getElementById('homeBtn').style.display = 'block';
+
+      if (gameMode === 'timeAttack') startTimer();
+      else document.getElementById('timer').textContent = '';
+
+      setTimeout(() => {
+        const input = document.getElementById('answerInput');
+        if (input) input.focus();
+      }, 100);
+    }
+
+    function startTimer() {
+      timeLeft = 10;
+      updateTimerDisplay();
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 3) document.getElementById('timer').classList.add('warning');
+        if (timeLeft <= 0) { clearInterval(timer); handleTimeAttackAnswer(); }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById('timer');
+      timerEl.textContent = `⏱️ ${timeLeft}초`;
+      if (timeLeft > 3) timerEl.classList.remove('warning');
+    }
+
+    async function checkAnswer() {
+      if (timer) clearInterval(timer);
+
+      const input = document.getElementById('answerInput');
+      const userAnswer = input.value.trim();
+      const correctAnswer = questionSet[currentQuestionIndex].answer;
+
+      if (!userAnswer) {
+        alert('답을 입력해주세요!');
+        if (gameMode === 'timeAttack') startTimer();
+        return;
+      }
+
+      document.getElementById('checkBtn').disabled = true;
+
+      const isCorrect = await validateWithAI(userAnswer, correctAnswer);
+
+      if (isCorrect) input.classList.add('correct');
+      else input.classList.add('incorrect');
+
+      recordAnswer(isCorrect, userAnswer);
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    async function handleTimeAttackAnswer() {
+      if (timer) clearInterval(timer);
+
+      const input = document.getElementById('answerInput');
+      const userAnswer = input.value.trim();
+      const correctAnswer = questionSet[currentQuestionIndex].answer;
+
+      const isCorrect = userAnswer ? await validateWithAI(userAnswer, correctAnswer) : false;
+
+      recordAnswer(isCorrect, userAnswer);
+
+      if (currentQuestionIndex < 9) {
+        currentQuestionIndex++;
+        displayQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function recordAnswer(isCorrect, userAnswer) {
+      userAnswers.push({
+        questionParts: questionSet[currentQuestionIndex].display.slice(),
+        correctAnswer: questionSet[currentQuestionIndex].answer,
+        userAnswer: userAnswer || '시간 초과',
+        isCorrect: isCorrect
+      });
+    }
+
+    function nextQuestion() {
+      if (gameMode === 'timeAttack') handleTimeAttackAnswer();
+      else {
+        if (currentQuestionIndex < 9) { currentQuestionIndex++; displayQuestion(); }
+        else showResults();
+      }
+    }
+
+    function showResults() {
+      const correctCount = userAnswers.filter(a => a.isCorrect).length;
+
+      let badge, title;
+      if (correctCount === 10) { badge = '🏆'; title = 'Perfect!'; }
+      else if (correctCount >= 8) { badge = '🎉'; title = 'Great!'; }
+      else if (correctCount >= 5) { badge = '👍'; title = 'Good!'; }
+      else { badge = '💪'; title = 'Cheer up!'; }
+
+      document.getElementById('resultNickname').textContent = `${nickname}님`;
+      document.getElementById('resultBadge').textContent = badge;
+      document.getElementById('resultTitle').textContent = title;
+      document.getElementById('finalScore').textContent = correctCount;
+
+      const detailsDiv = document.getElementById('resultDetails');
+      detailsDiv.innerHTML = '<h3>정답 내역</h3>';
+
+      userAnswers.forEach((answer, index) => {
+        const parts = answer.questionParts.map(p => p === 'blank' ? answer.userAnswer : p);
+        const rendered = parts.join(' ');
+        const correctAnswerText = answer.isCorrect ? '' : ` (정답: ${answer.correctAnswer})`;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'result-item';
+        itemDiv.innerHTML = `
+          <span class="result-number">${index + 1}.</span>
+          <span class="result-status ${answer.isCorrect ? 'correct' : 'incorrect'}">${answer.isCorrect ? '✓' : '✗'}</span>
+          <span class="result-question"> ${rendered}${correctAnswerText}</span>
+        `;
+        detailsDiv.appendChild(itemDiv);
+      });
+
+      showScreen('resultScreen');
+    }
+
+    async function validateWithAI(userAnswer, correctAnswer) {
+      try {
+        const normalized1 = normalizeAnswer(userAnswer);
+        const normalized2 = normalizeAnswer(correctAnswer);
+        if (normalized1 === normalized2) return true;
+
+        // 키 없이 호출하면 실패합니다. 실패 시 정규화 비교로 판정.
+        const prompt = `두 수학식이 수학적으로 동치(equivalent)인지 판단해주세요.
+
+사용자 답변: ${userAnswer}
+정답: ${correctAnswer}
+
+정확히 {"equivalent": true} 또는 {"equivalent": false} 형식으로만 답변하세요.`;
+
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 300,
+            messages: [{ role: "user", content: prompt }],
+          })
+        });
+
+        if (!response.ok) return normalized1 === normalized2;
+
+        const data = await response.json();
+        const text = data.content?.[0]?.text?.trim() || '';
+        const jsonMatch = text.match(/\{[^}]+\}/);
+        if (jsonMatch) {
+          const result = JSON.parse(jsonMatch[0]);
+          return result.equivalent === true;
+        }
+        return false;
+      } catch (e) {
+        return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
+      }
+    }
+
+    function normalizeAnswer(answer) {
+      let normalized = String(answer || '').replace(/\s+/g, '').toLowerCase();
+
+      normalized = normalized.replace(/\*/g, '').replace(/×/g, '');
+      normalized = normalized.replace(/（/g, '(').replace(/）/g, ')').replace(/\[/g, '(').replace(/\]/g, ')');
+
+      // 지수 표기 통일: a^2 -> a2 형태로 단순화(현 방식 유지)
+      normalized = normalized.replace(/\^/g, '');
+
+      // 유니코드 위첨자 처리(²,³,⁴ → 2,3,4)
+      normalized = normalized.replace(/²/g,'2').replace(/³/g,'3').replace(/⁴/g,'4');
+
+      // 기호 주변 정리
+      normalized = normalized.replace(/\s*\+\s*/g, '+').replace(/\s*-\s*/g, '-');
+
+      // 곱셈의 교환법칙을 완전히 처리하진 않음(필요 시 AI 판정 사용)
+      return normalized;
+    }
+
+    function buildShareCard() {
+      const correctCount = userAnswers.filter(a => a.isCorrect).length;
+
+      let badge, title;
+      if (correctCount === 10) { badge = '🏆'; title = 'Perfect!'; }
+      else if (correctCount >= 8) { badge = '🎉'; title = 'Great!'; }
+      else if (correctCount >= 5) { badge = '👍'; title = 'Good!'; }
+      else { badge = '💪'; title = 'Cheer up!'; }
+
+      document.getElementById('shareName').textContent = `${nickname}님`;
+      document.getElementById('shareBadge').textContent = badge;
+      document.getElementById('shareTitle').textContent = title;
+      document.getElementById('shareScore').textContent = `${correctCount} / 10`;
+
+      const list = document.getElementById('shareList');
+      list.innerHTML = '';
+
+      userAnswers.forEach((a, i) => {
+        const parts = a.questionParts.map(p => p === 'blank' ? a.userAnswer : p);
+        const formulaText = parts.join(' ');
+        const extra = a.isCorrect ? '' : ` (정답: ${a.correctAnswer})`;
+
+        const row = document.createElement('div');
+        row.className = 'shareRow';
+        row.innerHTML = `
+          <div class="shareIdx">${i + 1}.</div>
+          <div class="shareMark ${a.isCorrect ? 'ok' : 'no'}">${a.isCorrect ? '✓' : '✗'}</div>
+          <div class="shareText">${escapeHtml(formulaText + extra)}</div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function shareResult() {
+      const correctCount = userAnswers.filter(a => a.isCorrect).length;
+      const modeText = gameMode === 'timeAttack' ? '⚡타임어택' : '🎯프리모드';
+
+      buildShareCard();
+
+      const stage = document.getElementById('shareStage');
+      stage.style.left = '0px';
+      stage.style.top = '0px';
+      stage.style.opacity = '1';
+
+      await new Promise(r => setTimeout(r, 80));
+
+      const target = document.getElementById('shareCard');
+
+      try {
+        const canvas = await html2canvas(target, {
+          backgroundColor: '#ffffff',
+          scale: 3,
+          useCORS: true,
+          logging: false,
+          allowTaint: true
+        });
+
+        stage.style.left = '-99999px';
+
+        const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
+        if (!blob) { alert('이미지 생성에 실패했습니다.'); return; }
+
+        const file = new File([blob], `${nickname}_퀴즈결과.png`, { type: 'image/png' });
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: '지니GO수학 퀴즈 결과',
+            text: `${nickname}님의 결과 (${modeText}): ${correctCount}/10`,
+            files: [file]
+          });
+        } else {
+          downloadImage(canvas, `${nickname}_퀴즈결과.png`);
+        }
+      } catch (err) {
+        stage.style.left = '-99999px';
+        console.error('캡처 오류:', err);
+        alert('이미지 생성 중 오류가 발생했습니다. 스크린샷을 직접 찍어주세요.');
+      }
+    }
+
+    function downloadImage(canvas, filename) {
+      const url = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      link.click();
+      alert('이미지가 다운로드되었습니다!');
+    }
+
+    function restartGame() {
+      if (timer) clearInterval(timer);
+      document.getElementById('nicknameInput').value = '';
+      showScreen('nicknameScreen');
+    }
+
+    function goHome() {
+      if (timer) clearInterval(timer);
+      if (confirm('게임을 종료하고 메인으로 돌아가시겠습니까?')) {
+        document.getElementById('nicknameInput').value = '';
+        showScreen('nicknameScreen');
+      } else {
+        if (gameMode === 'timeAttack') startTimer();
+      }
+    }
+
+    document.getElementById('nicknameInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') startGame();
+    });
+  </script>
+</body>
+</html>
