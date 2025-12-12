@@ -224,13 +224,113 @@
     .result-status.incorrect{color:#dc2626}
 
     .logo-container{text-align:center;margin-top:40px;padding-top:30px;border-top:2px solid #e9ecef}
+
+    /* ✅ ✅ ✅ 지니GO수학 로고 “빛나는 효과” 적용 (기존 .logo-text 덮어씀) */
     .logo-text{
-      font-size:1.5em;
+      position:relative;
+      display:inline-block;
+      font-size:1.6em;
       font-weight:900;
-      background:linear-gradient(135deg,#8b7355 0%,#a0826d 100%);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
       letter-spacing:2px;
+      padding:10px 18px;
+      border-radius:16px;
+
+      background: linear-gradient(
+        90deg,
+        #7c5c3a 0%,
+        #d7c2a3 18%,
+        #8b6b4a 36%,
+        #f3e7d6 52%,
+        #9a7754 68%,
+        #e7d4b8 84%,
+        #7c5c3a 100%
+      );
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+
+      text-shadow:
+        0 0 10px rgba(255, 232, 186, .25),
+        0 0 26px rgba(255, 232, 186, .18);
+    }
+    .logo-text::after{
+      content:"";
+      position:absolute;
+      inset:-10px -30px;
+      border-radius:18px;
+      pointer-events:none;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255,255,255,0) 35%,
+        rgba(255,255,255,.9) 48%,
+        rgba(255,255,255,0) 55%,
+        transparent 100%
+      );
+      transform: translateX(-120%) skewX(-18deg);
+      filter: blur(.2px);
+      mix-blend-mode: screen;
+      animation: logoShine 2.8s ease-in-out infinite;
+    }
+    .logo-text::before{
+      content:"";
+      position:absolute;
+      inset:-8px -12px;
+      border-radius:18px;
+      pointer-events:none;
+      background: radial-gradient(circle at 30% 30%,
+        rgba(255,255,255,.55) 0%,
+        rgba(255,224,160,.25) 28%,
+        rgba(255,224,160,.12) 45%,
+        rgba(255,224,160,0) 70%
+      );
+      filter: blur(6px);
+      opacity:.55;
+      animation: logoGlow 2.2s ease-in-out infinite;
+    }
+    @keyframes logoShine{
+      0%   { transform: translateX(-140%) skewX(-18deg); opacity:0; }
+      10%  { opacity:.25; }
+      45%  { opacity:1; }
+      70%  { opacity:.35; }
+      100% { transform: translateX(140%) skewX(-18deg); opacity:0; }
+    }
+    @keyframes logoGlow{
+      0%,100% { opacity:.45; transform: scale(1); }
+      50%     { opacity:.75; transform: scale(1.03); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .logo-text::after, .logo-text::before{ animation:none !important; }
+    }
+    /* ✅ ✅ ✅ 끝 */
+
+    /* 카카오 인앱 안내 배너 */
+    #inappBanner{
+      position:fixed;
+      top:0; left:0; right:0;
+      z-index:99999;
+      display:none;
+      background:#111827;
+      color:#ffffff;
+      padding:12px 14px;
+      text-align:center;
+      font-size:13px;
+      font-weight:800;
+      line-height:1.4;
+    }
+    #inappBanner b{color:#fde047}
+    #inappBanner .small{display:block;font-weight:700;opacity:.92;margin-top:2px}
+    #inappBanner .close{
+      position:absolute;
+      right:10px;
+      top:8px;
+      width:28px;height:28px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      background:rgba(255,255,255,.12);
+      color:#fff;
+      font-weight:900;
     }
 
     /* 캡처 전용 카드 */
@@ -251,49 +351,18 @@
       box-shadow:0 0 0 rgba(0,0,0,0);
       border:0;
     }
-    .shareTop{
-      padding:34px 30px 10px;
-      text-align:center;
-      background:#ffffff;
-    }
-    .shareName{
-      font-size:42px;
-      font-weight:900;
-      color:#111827;
-      margin-bottom:10px;
-      letter-spacing:.2px;
-    }
-    .shareBadge{
-      font-size:52px;
-      line-height:1;
-      margin:8px 0 6px;
-    }
-    .shareTitle{
-      font-size:56px;
-      font-weight:900;
-      color:#6b7280;
-      margin:8px 0 0;
-    }
-    .shareScore{
-      font-size:88px;
-      font-weight:900;
-      color:#4f46e5;
-      margin:6px 0 18px;
-    }
+    .shareTop{padding:34px 30px 10px;text-align:center;background:#ffffff}
+    .shareName{font-size:42px;font-weight:900;color:#111827;margin-bottom:10px;letter-spacing:.2px}
+    .shareBadge{font-size:52px;line-height:1;margin:8px 0 6px}
+    .shareTitle{font-size:56px;font-weight:900;color:#6b7280;margin:8px 0 0}
+    .shareScore{font-size:88px;font-weight:900;color:#4f46e5;margin:6px 0 18px}
     .shareBox{
       margin:18px 22px 0;
       background:#F9E86A;
       border-radius:26px;
       padding:26px 26px 22px;
     }
-    .shareBoxTitle{
-      text-align:center;
-      font-size:26px;
-      font-weight:900;
-      color:#374151;
-      margin-bottom:18px;
-      letter-spacing:.2px;
-    }
+    .shareBoxTitle{text-align:center;font-size:26px;font-weight:900;color:#374151;margin-bottom:18px;letter-spacing:.2px}
     .shareRow{
       display:flex;
       gap:12px;
@@ -323,12 +392,7 @@
       background:#eae6df;
       margin-top:18px;
     }
-    .shareFootText{
-      font-size:52px;
-      font-weight:900;
-      color:#b7b2ab;
-      letter-spacing:2px;
-    }
+    .shareFootText{font-size:52px;font-weight:900;color:#b7b2ab;letter-spacing:2px}
 
     @media (max-width: 768px){
       .container{padding:30px 20px}
@@ -349,11 +413,18 @@
 </head>
 
 <body>
+  <!-- 카카오 인앱 브라우저 안내 -->
+  <div id="inappBanner" role="alert" aria-live="polite">
+    카카오톡에서는 “이미지 공유”가 제한될 수 있습니다.
+    <span class="small"> " ⋮ " → <b>다른 브라우저로 열기</b>를 눌러주세요.</span>
+    <button class="close" type="button" aria-label="닫기" onclick="document.getElementById('inappBanner').style.display='none'">×</button>
+  </div>
+
   <div class="container">
     <!-- 닉네임 입력 -->
     <div id="nicknameScreen" class="screen active">
       <h1>🧮 곱셈공식 퀴즈</h1>
-      <p class="subtitle">AI가 수학적으로 동치인 답안을 자동으로 인식합니다</p>
+      <p class="subtitle">AI가 답안을 자동으로 인식합니다만 약간의 오류가 있을 수 있습니다.^^; </p>
 
       <div class="nickname-input">
         <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20" inputmode="text" autocapitalize="off">
@@ -463,22 +534,45 @@
   </div>
 
   <script>
-    // ✅ 요청하신 “(a+b+c)^2, (a^3±b^3), 3변수 항등식/인수분해” 계열을 대량 추가
+    function detectInAppAndShowBanner() {
+      const ua = (navigator.userAgent || '').toLowerCase();
+      const isKakao = ua.includes('kakaotalk');
+      if (isKakao) {
+        document.getElementById('inappBanner').style.display = 'block';
+        document.body.style.paddingTop = '56px';
+      }
+    }
+
+    function openExternalBrowser() {
+      const ua = (navigator.userAgent || '').toLowerCase();
+      const url = location.href;
+      const isAndroid = ua.includes('android');
+      const isIOS = /iphone|ipad|ipod/.test(ua);
+
+      if (isAndroid) {
+        const withoutScheme = url.replace(/^https?:\/\//, '');
+        location.href = `intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;end`;
+        return;
+      }
+      if (isIOS) {
+        alert('iPhone에서는 카카오톡 공유 버튼 → “Safari에서 열기/브라우저로 열기”를 선택해주세요.');
+        return;
+      }
+      window.open(url, '_blank');
+    }
+
     const formulas = [
-      // (a+b+c)^2, a^2+b^2+c^2 관련
       { display: ["(a+b+c)²", "=", "a²", "+", "b²", "+", "c²", "+", "2ab", "+", "2bc", "+", "blank"], answer: "2ca" },
       { display: ["(a+b+c)²", "=", "a²", "+", "b²", "+", "c²", "+", "blank", "+", "2bc", "+", "2ca"], answer: "2ab" },
       { display: ["(a+b+c)²", "=", "a²", "+", "b²", "+", "c²", "+", "2ab", "+", "blank", "+", "2ca"], answer: "2bc" },
       { display: ["a²+b²+c²", "=", "(a+b+c)²", "-", "blank"], answer: "2(ab+bc+ca)" },
       { display: ["a²+b²+c²", "=", "(a+b+c)²", "-", "2ab", "-", "2bc", "-", "blank"], answer: "2ca" },
 
-      // 3차 전개
       { display: ["(a+b)³", "=", "a³", "+", "blank", "+", "3ab²", "+", "b³"], answer: "3a²b" },
       { display: ["(a-b)³", "=", "a³", "-", "blank", "+", "3ab²", "-", "b³"], answer: "3a²b" },
       { display: ["(a-b)³", "=", "a³", "-", "3a²b", "+", "blank", "-", "b³"], answer: "3ab²" },
       { display: ["(a+b)³", "=", "blank", "+", "3a²b", "+", "3ab²", "+", "b³"], answer: "a³" },
 
-      // a^3 ± b^3 인수분해
       { display: ["(a+b)(a²-ab+b²)", "=", "a³", "+", "blank"], answer: "b³" },
       { display: ["(a-b)(a²+ab+b²)", "=", "a³", "-", "blank"], answer: "b³" },
       { display: ["a³+b³", "=", "(a+b)³", "-", "3ab", "blank"], answer: "(a+b)" },
@@ -486,34 +580,27 @@
       { display: ["a³+b³", "=", "(a+b)(a²-ab+b²)", "=", "blank"], answer: "(a+b)³-3ab(a+b)" },
       { display: ["a³-b³", "=", "(a-b)(a²+ab+b²)", "=", "blank"], answer: "(a-b)³+3ab(a-b)" },
 
-      // (x+a)(x+b)(x+c)
       { display: ["(x+a)(x+b)(x+c)", "=", "x³", "+", "(a+b+c)x²", "+", "blank", "+", "abc"], answer: "(ab+bc+ca)x" },
       { display: ["(x+a)(x+b)(x+c)", "=", "x³", "+", "blank", "+", "(ab+bc+ca)x", "+", "abc"], answer: "(a+b+c)x²" },
 
-      // (a+b+c)(a^2+b^2+c^2-ab-bc-ca)
       { display: ["(a+b+c)(a²+b²+c²-ab-bc-ca)", "=", "a³", "+", "b³", "+", "c³", "-", "blank"], answer: "3abc" },
       { display: ["(a+b+c)(a²+b²+c²-ab-bc-ca)", "=", "blank", "+", "b³", "+", "c³", "-", "3abc"], answer: "a³" },
 
-      // a^3+b^3+c^3 항등식
       { display: ["a³+b³+c³", "=", "(a+b+c)(a²+b²+c²-ab-bc-ca)", "+", "blank"], answer: "3abc" },
       { display: ["a³+b³+c³", "=", "blank", "+", "3abc"], answer: "(a+b+c)(a²+b²+c²-ab-bc-ca)" },
 
-      // a^2+b^2+c^2-ab-bc-ca = 1/2(...)
       { display: ["a²+b²+c²-ab-bc-ca", "=", "1/2{(a-b)²+(b-c)²+", "blank", "}"], answer: "(c-a)²" },
       { display: ["a²+b²+c²-ab-bc-ca", "=", "1/2{(a-b)²+", "blank", "+(c-a)²}"], answer: "(b-c)²" },
 
-      // (a^2+ab+b^2)(a^2-ab+b^2)
       { display: ["(a²+ab+b²)(a²-ab+b²)", "=", "a⁴", "+", "a²b²", "+", "blank"], answer: "b⁴" },
       { display: ["(a²+ab+b²)(a²-ab+b²)", "=", "blank", "+", "a²b²", "+", "b⁴"], answer: "a⁴" },
 
-      // 추가로 자주 나오는 2변수/기본
       { display: ["(x+3)(x+5)", "=", "x²", "+", "blank", "+", "15"], answer: "8x" },
       { display: ["(3x+5)(3x-5)", "=", "blank", "-", "25"], answer: "9x²" },
       { display: ["(5x-2y)²", "=", "blank", "-", "20xy", "+", "4y²"], answer: "25x²" },
       { display: ["(2x+3)(3x+4)", "=", "blank", "+", "17x", "+", "12"], answer: "6x²" },
       { display: ["(a+b)²", "=", "a²", "+", "blank", "+", "b²"], answer: "2ab" },
 
-      // 3변수 보조 패턴(자주 출제되는 형태)
       { display: ["ab+bc+ca", "=", "blank"], answer: "( (a+b+c)² - (a²+b²+c²) ) / 2" },
       { display: ["a²+b²+c²", "=", "(a+b+c)²", "-", "2ab", "-", "2bc", "-", "blank"], answer: "2ca" },
     ];
@@ -541,7 +628,6 @@
     }
 
     function prepareQuiz() {
-      // 중복 방지 셔플
       const shuffled = [...formulas].sort(() => Math.random() - 0.5);
       questionSet = shuffled.slice(0, 10);
       currentQuestionIndex = 0;
@@ -729,7 +815,6 @@
         const normalized2 = normalizeAnswer(correctAnswer);
         if (normalized1 === normalized2) return true;
 
-        // 키 없이 호출하면 실패합니다. 실패 시 정규화 비교로 판정.
         const prompt = `두 수학식이 수학적으로 동치(equivalent)인지 판단해주세요.
 
 사용자 답변: ${userAnswer}
@@ -764,20 +849,11 @@
 
     function normalizeAnswer(answer) {
       let normalized = String(answer || '').replace(/\s+/g, '').toLowerCase();
-
       normalized = normalized.replace(/\*/g, '').replace(/×/g, '');
       normalized = normalized.replace(/（/g, '(').replace(/）/g, ')').replace(/\[/g, '(').replace(/\]/g, ')');
-
-      // 지수 표기 통일: a^2 -> a2 형태로 단순화(현 방식 유지)
       normalized = normalized.replace(/\^/g, '');
-
-      // 유니코드 위첨자 처리(²,³,⁴ → 2,3,4)
       normalized = normalized.replace(/²/g,'2').replace(/³/g,'3').replace(/⁴/g,'4');
-
-      // 기호 주변 정리
       normalized = normalized.replace(/\s*\+\s*/g, '+').replace(/\s*-\s*/g, '-');
-
-      // 곱셈의 교환법칙을 완전히 처리하진 않음(필요 시 AI 판정 사용)
       return normalized;
     }
 
@@ -834,7 +910,7 @@
       stage.style.top = '0px';
       stage.style.opacity = '1';
 
-      await new Promise(r => setTimeout(r, 80));
+      await new Promise(r => setTimeout(r, 120));
 
       const target = document.getElementById('shareCard');
 
@@ -854,15 +930,23 @@
 
         const file = new File([blob], `${nickname}_퀴즈결과.png`, { type: 'image/png' });
 
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        const canFileShare =
+          !!navigator.share &&
+          !!navigator.canShare &&
+          navigator.canShare({ files: [file] });
+
+        if (canFileShare) {
           await navigator.share({
             title: '지니GO수학 퀴즈 결과',
             text: `${nickname}님의 결과 (${modeText}): ${correctCount}/10`,
             files: [file]
           });
-        } else {
-          downloadImage(canvas, `${nickname}_퀴즈결과.png`);
+          return;
         }
+
+        alert('현재 브라우저(예: 카카오톡 내부 브라우저)에서는 “이미지 파일 공유”가 제한될 수 있어, 다운로드로 저장됩니다.\n저장 후 갤러리에서 공유하시거나, “브라우저로 열기”를 눌러 크롬/사파리에서 다시 시도해주세요.');
+        downloadImage(canvas, `${nickname}_퀴즈결과.png`);
+
       } catch (err) {
         stage.style.left = '-99999px';
         console.error('캡처 오류:', err);
@@ -876,7 +960,6 @@
       link.download = filename;
       link.href = url;
       link.click();
-      alert('이미지가 다운로드되었습니다!');
     }
 
     function restartGame() {
@@ -898,6 +981,8 @@
     document.getElementById('nicknameInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') startGame();
     });
+
+    detectInAppAndShowBanner();
   </script>
 </body>
 </html>
